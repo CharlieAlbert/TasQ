@@ -2,10 +2,12 @@ package main
 
 import (
 	"log"
+	"time"
 
 	"github.com/CharlieAlbert/TasQ/config"
 	"github.com/CharlieAlbert/TasQ/internal/db"
 	"github.com/CharlieAlbert/TasQ/internal/jobs"
+	"github.com/CharlieAlbert/TasQ/internal/worker"
 )
 
 func main() {
@@ -16,18 +18,10 @@ func main() {
 	// Initialize repository and service
 	jobRepo := jobs.NewRepository(db.DB)
 	jobService := jobs.NewService(jobRepo)
+	worker := worker.NewWorker(jobService)
 
-	payload := map[string]any{
-		"user_id":  123,
-		"task":     "send_email",
-		"priority": "high",
-	}
+	log.Println("🚀 Starting job worker...")
+	go worker.StartPolling(5 * time.Second)
 
-	// Enqueue job
-	err := jobService.EnqueueJob("email_task", payload)
-	if err != nil {
-		log.Fatalf("❌ Failed to enqueue job: %v", err)
-	}
-
-	log.Println("✅ Job successfully enqueued")
+	select {}
 }
