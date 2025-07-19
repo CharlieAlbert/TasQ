@@ -75,7 +75,7 @@ func (r *Repository) FetchNextPendingJob(ctx context.Context) (*Job, error) {
 	WHERE status = 'queued'
 	ORDER BY created_at ASC
 	LIMIT 1
-	FOR UPDATE SKIP LOCKER`
+	FOR UPDATE SKIP LOCKED`
 
 	row := r.db.QueryRow(ctx, query)
 
